@@ -76,25 +76,27 @@ function pick_version (versions, wanted) {
   if (wanted.startsWith('v')) wanted = wanted.slice(1)
   // match maj min patch
   if (versions.includes(wanted)) return wanted
+  // below *map objects map to the highest version number among (*)
   // fallback to maj min match
-  var maj_min = versions.reduce(function (acc, cur) {
-    acc[cur.replace(/\.[^\.]*$/, '')] = cur
+  var maj_min_map = versions.reduce(function (acc, cur) {
+    var maj_min = cur.replace(/\.[^\.]*$/, '')
+    if (!acc[maj_min] || v2i(cur) > v21(acc[maj_min])) acc[maj_min] = cur
     return acc
   }, {})
   var wanted_maj_min = wanted.replace(/\.$/, '')
-  if (maj_min[wanted_maj_min]) return maj_min[wanted_maj_min]
+  if (maj_min_map[wanted_maj_min]) return maj_min_map[wanted_maj_min]
   // fallback to maj match
-  var maj = Object.keys(maj_min)
+  var maj_map = Object.keys(maj_min_map)
     .reduce(function (acc, cur) {
-      acc[cur.replace(/\.[^\.]*$/, '')] = maj_min[cur]
+      acc[cur.replace(/\.[^\.]*$/, '')] = maj_min_map[cur]
       return acc
     }, {})
   var wanted_maj = wanted_maj_min.replace(/\.$/, '')
-  if (maj[wanted_maj]) return maj[wanted_maj]
+  if (maj_map[wanted_maj]) return maj_map[wanted_maj]
 }
 
 function v2i (version) {
-  return Number(version.replace(/(^.*\.\d).*$/, '$1').replace(/\./g, ''))
+  return Number(version.replace(/^(.+\.\d).*$/, '$1').replace(/\./g, ''))
 }
 
 function find_latest (versions) {
