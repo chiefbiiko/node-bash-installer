@@ -12,6 +12,8 @@ tape('mini test', function (t) {
     getz(uri, function (err, buf) {
       if (err) t.end(err)
       t.pass(`got a response from ${uri}`)
+      t.ok(buf.length, 'buf got some length')
+      t.true(String(buf.slice(0, 20)).startswith('#!/usr/bin/env bash'), 'bash')
       child.kill()
       t.end()
     })
