@@ -3,8 +3,8 @@
 set -Eeo pipefail
 
 print_help () {
-  echo "offline node installer for linux x64"
-  echo "installs the latest nodejs version from the attached tarball."
+  echo "node-bash-installer"
+  echo "installs node from the attached tarball."
   echo "usage: bash $0"
 }
 
