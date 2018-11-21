@@ -1,0 +1,28 @@
+{
+  "name": "node-bash-installer-service",
+  "version": "0.0.0",
+  "description": "ephemeral service that serves node-bash-installers",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chiefbiiko/node-bash-installer.git"
+  },
+  "keywords": [
+    "nodejs",
+    "node",
+    "bash",
+    "installer"
+  ],
+  "author": "Noah Anabiik Schwarz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chiefbiiko/node-bash-installer/issues"
+  },
+  "homepage": "https://github.com/chiefbiiko/node-bash-installer#readme",
+  "devDependencies": {
+    "tape": "^4.9.1"
+  }
+}
