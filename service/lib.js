@@ -6,14 +6,14 @@ var NODE_DIST_URI = 'https://nodejs.org/dist/'
 var FALLBACK = { os: 'linux', arch: 'x64', version: '' }
 var SKELETON = Buffer.from('') // TODO: skeleton.sh buf
 
-var errors = {
-  bad_version (version) {
-    return Error(`no such node version: ${version}`)
-  },
-  bad_request (query) {
-    return Error(`unsupported request params: ${JSON.stringify(query)}`)
-  }
-}
+// var errors = {
+  // bad_version (version) {
+  //   return Error(`no such node version: ${version}`)
+  // },
+  // bad_request (query) {
+  //   return Error(`unsupported request params: ${JSON.stringify(query)}`)
+  // }
+// }
 
 function log_info (...args) {
   console.log('[node-bash-installer service info]', ...args)
@@ -25,8 +25,8 @@ function log_err (...args) {
 
 function http_panic (res, err, status = 500) {
   log_err(err.message)
-  res.statusCode = status
-  res.end(JSON.stringify({ error: err, message: err.message }))
+  res.writeHead(status, { 'content-type': 'application/json' })
+  res.end(JSON.stringify({ error: err.message, status }))
 }
 
 function parse_query_params (req) {
@@ -93,49 +93,57 @@ function pick_version (versions, wanted) {
     }, {})
   var wanted_maj = wanted_maj_min.replace(/\.$/, '')
   if (maj_map[wanted_maj]) return maj_map[wanted_maj]
+  // last resort - latest version
+  return maj_map[String(Math.max(Object.keys(maj_map)))]
 }
 
 function v2i (version) {
   return Number(version.replace(/^(.+\.\d).*$/, '$1').replace(/\./g, ''))
 }
 
-function find_latest (versions) {
-  for (
-    var len = versions.length,
-    version = versions[0],
-    prev = v2i(version),
-    i = 0;
-    i < len; i++
-  ) {
-    v = versions[i]
-    if (v2i(v) > prev) version = v
-  }
-  return version
+// function find_latest (versions) {
+//   for (
+//     var len = versions.length,
+//     version = versions[0],
+//     prev = v2i(version),
+//     i = 0;
+//     i < len; i++
+//   ) {
+//     v = versions[i]
+//     if (v2i(v) > prev) version = v
+//   }
+//   return version
+// }
+
+function is_node_semver (version) {
+  return /^\d{1,2}\.\d{1}\.{1}\.?$/.test(version)
 }
 
 function to_tarball_url (os, arch, version) {
   return `https://nodejs.org/dist/v${version}/node-v${version}-${os}-${arch}.tar.gz`
 }
 
+// TODO: use some request identifier for better logs
 function serve (req, res) {
   log_info(`incoming request for: ${req.url}`)
   // what u want
   var query = parse_query_params(req)
   // fetch node dist list
   list_versions(function (err, versions) {
-    if (err) return http_panic(res, err)
-    var version
-    if (query.version) {
-      version = pick_version(versions, query.version)
-      if (!version) return http_panic(res, errors.bad_version(query.version))
-    } else {
-      version = find_latest(versions)
-    }
+    if (err) return http_panic(res, err, 500)
+    if (!is_node_semver(query.version)) return http_panic(res, Error('bad version'), 405)
+    var version = pick_version(versions, query.version)
+    // if (query.version) {
+    //   version = pick_version(versions, query.version)
+    //   if (!version) return http_panic(res, errors.bad_version(query.version))
+    // } else {
+    //   version = find_latest(versions)
+    // }
     // fetch tarball
     var tarball_url = to_tarball_url(query.os, query.arch, version)
     log_info(`fetching tarball @ ${tarball_url}`)
     getz(tarball_url, function (err, tarball) {
-      if (err) return http_panic(res, err)
+      if (err) return http_panic(res, err) // FIND: http code to indicate dep err
       // concat skeleton.bash with the tarball
       var payload = Buffer.concat([ SKELETON, tarball ])
       // serve it with correct content type
