@@ -88,9 +88,7 @@ function v2i (version) {
 }
 
 function is_node_semver (version) {
-  return /^\d{1,2}\.\d{1}\.{1}\.?$/.test(version) ||
-    /^\d{1,2}\.\d{1}\.?$/.test(version) ||
-    /^\d{1,2}\.?$/.test(version)
+  return /^\d{1,2}(?:\.\d){0,2}\.?$/.test(version)
 }
 
 function to_tarball_url (os, arch, version) {
