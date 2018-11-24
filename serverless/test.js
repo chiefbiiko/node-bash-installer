@@ -70,12 +70,16 @@ tape('pick_version', function (t) {
 })
 
 tape('parse_query_params', function (t) {
-  var req1 = { url: 'http://localhost:41900/fraud?os=darwin&arch=x64&version=11' }
+  var req1 = { 
+    url: 'http://localhost:41900/fraud?os=darwin&arch=x64&version=11'
+  }
   var query = parse_query_params(req1)
   t.equal(query.os, 'darwin', 'parsed os')
   t.equal(query.arch, 'x64', 'parsed arch')
   t.equal(query.version, '11', 'parsed node version')
-  var req2 = { url: 'http://localhost:41900/fraud?arch=x64' }
+  var req2 = { 
+    url: 'http://localhost:41900/fraud?arch=x64' 
+  }
   var query = parse_query_params(req2)
   t.equal(query.os, 'linux', 'os fallback')
   t.equal(query.arch, 'x64', 'parsed arch pt 2')

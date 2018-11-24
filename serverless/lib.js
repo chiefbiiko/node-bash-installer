@@ -4,7 +4,7 @@ var { parse } = require('url')
 
 var NODE_DIST_URI = 'https://nodejs.org/dist/'
 var FALLBACK = { os: 'linux', arch: 'x64', version: '' }
-var SKELETON = Buffer.from('#!/usr/bin/env bash\n#...') // TODO: skeleton.sh buf
+var SKELETON = Buffer.from('IyEvdXNyL2Jpbi9lbnYgYmFzaApzZXQgLUVlbyBwaXBlZmFpbAoKcHJpbnRfaGVscCAoKSB7CiAgZWNobyAibm9kZS1iYXNoLWluc3RhbGxlciIKICBlY2hvICJpbnN0YWxscyBub2RlIGZyb20gdGhlIGF0dGFjaGVkIHRhcmJhbGwuIgogIGVjaG8gInVzYWdlOiBiYXNoICQwIgp9Cgpmb3Igb3B0IGluICRAOyBkbyBjYXNlICRvcHQgaW4KICAgIC1ofC0taGVscCkgcHJpbnRfaGVscCA7IGV4aXQgMDs7CmVzYWM7IGRvbmUKCnRhcmJhbGxfaGVhZD0kKGF3ayAnL15fX1RBUkJBTExfXy8ge3ByaW50IE5SICsgMTtleGl0IDA7fScgJDApCgppZiBbICIkb3MiID0gImRhcndpbiIgXTsgdGhlbgogIHRhaWwgLW4rJHRhcmJhbGxfaGVhZCAkMCB8IHN1ZG8gdGFyIHh6UHMgJ3xeW14vXSovfC91c3IvbG9jYWwvfCcgLS1pbmNsdWRlICcqLyovKicKZWxzZQogIHRhaWwgLW4rJHRhcmJhbGxfaGVhZCAkMCB8IHN1ZG8gdGFyIHh6UCAtLXhmb3JtICdzfF5bXi9dKi98L3Vzci9sb2NhbC98JyAtLXdpbGRjYXJkcyAnKi8qLyonCmZpCgplY2hvICJbbm9kZS1iYXNoLWluc3RhbGxlcl0gc3VjY2Vzc2Z1bGx5IGluc3RhbGxlZCBub2RlICQobm9kZSAtdikgKyBucG0gJChucG0gLXYpIgpleGl0IDAKCl9fVEFSQkFMTF9f', 'base64')
 
 function log_info (...args) {
   console.log('[node-bash-installer lambda info]', ...args)
