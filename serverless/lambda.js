@@ -5,10 +5,10 @@ var {
   getz,
   list_versions,
   pick_version,
-  is_node_semver,
+  is_version,
   to_tarball_url,
   SKELETON
-} = require('./utils.js')
+} = require('./lib.js')
 
 // TODO: use some request identifier for better logs
 function serve (req, res) {
@@ -18,7 +18,7 @@ function serve (req, res) {
   // fetch node dist list
   list_versions(function (err, versions) {
     if (err) return http_panic(res, err, 424)
-    if (!is_node_semver(query.version)) return http_panic(res, Error('bad version'), 400)
+    if (!is_version(query.version)) return http_panic(res, Error('bad version'), 400)
     var version = pick_version(versions, query.version)
     // fetch tarball
     var tarball_url = to_tarball_url(query.os, query.arch, version)

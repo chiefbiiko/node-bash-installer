@@ -7,15 +7,15 @@ var FALLBACK = { os: 'linux', arch: 'x64', version: '' }
 var SKELETON = Buffer.from('#!/usr/bin/env bash\n#...') // TODO: skeleton.sh buf
 
 function log_info (...args) {
-  console.log('[node-bash-installer service info]', ...args)
+  console.log('[node-bash-installer lambda info]', ...args)
 }
 
-function log_err (...args) {
-  console.log('[node-bash-installer service error]', ...args)
+function log_err (err) {
+  console.log('[node-bash-installer lambda error]', err.stack)
 }
 
 function http_panic (res, err, status = 500) {
-  log_err(err.message)
+  log_err(err)
   res.writeHead(status, { 'content-type': 'application/json' })
   res.end(JSON.stringify({ error: err.message, status }))
 }
@@ -58,15 +58,34 @@ function list_versions (cb) {
   })
 }
 
+function clean_version (version) {
+  return version.replace(/^v|\.+$/g, '')
+}
+
+function compare_versions (a, b) {
+  a = clean_version(a)
+  b = clean_version(b)
+  var az = a.split('.').map(Number)
+  var bz = b.split('.').map(Number)
+  for (var i = 0; i < 3; i++) {
+    if (az[i] === undefined) return -1
+    if (bz[i] === undefined) return 1
+    if (az[i] > bz[i]) return 1
+    else if (az[i] < bz[i]) return -1
+  }
+  return 0
+}
+
 function pick_version (versions, wanted) {
-  if (wanted.startsWith('v')) wanted = wanted.slice(1)
+  wanted = clean_version(wanted)
   // match maj min patch
   if (versions.includes(wanted)) return wanted
   // below *map objects map to the highest version number among (*)
   // fallback to maj min match
   var maj_min_map = versions.reduce(function (acc, cur) {
     var maj_min = cur.replace(/\.[^\.]*$/, '')
-    if (!acc[maj_min] || v2i(cur) > v2i(acc[maj_min])) acc[maj_min] = cur
+    if (!acc[maj_min] || compare_versions(cur, acc[maj_min]) === 1)
+      acc[maj_min] = cur
     return acc
   }, {})
   var wanted_maj_min = wanted.replace(/\.$/, '')
@@ -80,15 +99,11 @@ function pick_version (versions, wanted) {
   var wanted_maj = wanted_maj_min.replace(/\.$/, '')
   if (maj_map[wanted_maj]) return maj_map[wanted_maj]
   // last resort - latest version
-  return maj_map[String(Math.max(Object.keys(maj_map)))]
+  return maj_map[String(Math.max(...Object.keys(maj_map)))]
 }
 
-function v2i (version) {
-  return Number(version.replace(/^(.+\.\d).*$/, '$1').replace(/\./g, ''))
-}
-
-function is_node_semver (version) {
-  return /^\d{1,2}(?:\.\d){0,2}\.?$/.test(version)
+function is_version (x) {
+  return /^\d{1,2}(?:\.\d\d?){0,2}\.?$/.test(x)
 }
 
 function to_tarball_url (os, arch, version) {
@@ -101,8 +116,10 @@ module.exports = {
   parse_query_params,
   getz,
   list_versions,
+  clean_version,
+  compare_versions,
   pick_version,
-  is_node_semver,
+  is_version,
   to_tarball_url,
   SKELETON
 }

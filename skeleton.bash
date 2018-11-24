@@ -9,7 +9,7 @@ print_help () {
 }
 
 pinup () {
-  echo "[node-install-latest-offline] $1"
+  echo "[node-bash-installer] $1"
 }
 
 panic () {
@@ -27,9 +27,9 @@ fi
 
 tarball_head=$(awk '/^__TARBALL__/ {print NR + 1;exit 0;}' $0)
 if [ "$os" = "darwin" ]; then
-  tail -n+$tarball_head $0 | grep -e '\s' -r '' | sudo tar xzPs '|^[^/]*/|/usr/local/|' --include '*/*/*'
+  tail -n+$tarball_head $0 | sudo tar xzPs '|^[^/]*/|/usr/local/|' --include '*/*/*'
 else
-  tail -n+$tarball_head $0 | grep -e '\s' -r '' | sudo tar xzP --xform 's|^[^/]*/|/usr/local/|' --wildcards '*/*/*'
+  tail -n+$tarball_head $0 | sudo tar xzP --xform 's|^[^/]*/|/usr/local/|' --wildcards '*/*/*'
 fi
 pinup "successfully installed node $(node -v) + npm $(npm -v)"
 
