@@ -1,6 +1,6 @@
 var tape = require('tape')
 var { createServer } = require('http')
-var serve = require('./lambda.js')
+var serve = require('./api/installer/index.js')
 var {
   parse_query_params,
   getz,
