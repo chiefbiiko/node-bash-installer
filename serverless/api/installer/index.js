@@ -8,7 +8,7 @@ var {
   is_version,
   to_tarball_url,
   SKELETON
-} = require('./lib.js')
+} = require('./../../lib.js')
 
 // TODO: use some request identifier for better logs
 // TODO: set some informative respones headers: 
