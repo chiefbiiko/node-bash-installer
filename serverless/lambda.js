@@ -11,6 +11,8 @@ var {
 } = require('./lib.js')
 
 // TODO: use some request identifier for better logs
+// TODO: set some informative respones headers: 
+//       x-installer-node-version, x-installer-os, x-installer-arch
 function serve (req, res) {
   log_info(`incoming request for: ${req.url}`)
   // what u want

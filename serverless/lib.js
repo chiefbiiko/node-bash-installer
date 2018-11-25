@@ -24,9 +24,15 @@ function parse_query_params (req) {
   var params = parse(req.url).query.split('&').reduce(function (acc, cur) {
     if (!/[^\s]=[^\s]/.test(cur)) return acc
     var kv = cur.split('=')
-    acc[kv[0]] = kv[1]
+    acc[kv[0]] = kv[1].toLowerCase()
     return acc
   }, {})
+  if (!params.version) {
+    if (params.v) params.version = params.v
+    if (params['node-version']) params.version = params['node-version']
+    if (params.node_version) params.version = params.node_version
+  }
+  if (!params.arch && params.architecture) params.arch = params.architecture
   return Object.assign({}, FALLBACK, params)
 }
 
@@ -63,15 +69,13 @@ function clean_version (version) {
 }
 
 function compare_versions (a, b) {
-  a = clean_version(a)
-  b = clean_version(b)
-  var az = a.split('.').map(Number)
-  var bz = b.split('.').map(Number)
+  var az = clean_version(a).split('.').map(Number)
+  var bz = clean_version(b).split('.').map(Number)
   for (var i = 0; i < 3; i++) {
     if (az[i] === undefined) return -1
-    if (bz[i] === undefined) return 1
-    if (az[i] > bz[i]) return 1
+    else if (bz[i] === undefined) return 1
     else if (az[i] < bz[i]) return -1
+    else if (az[i] > bz[i]) return 1
   }
   return 0
 }
@@ -88,7 +92,7 @@ function pick_version (versions, wanted) {
       acc[maj_min] = cur
     return acc
   }, {})
-  var wanted_maj_min = wanted.replace(/\.$/, '')
+  var wanted_maj_min = wanted.replace(/^(\d+\.\d+).*$/, '$1')
   if (maj_min_map[wanted_maj_min]) return maj_min_map[wanted_maj_min]
   // fallback to maj match
   var maj_map = Object.keys(maj_min_map)
@@ -96,7 +100,7 @@ function pick_version (versions, wanted) {
       acc[cur.replace(/\.[^\.]*$/, '')] = maj_min_map[cur]
       return acc
     }, {})
-  var wanted_maj = wanted_maj_min.replace(/\.$/, '')
+  var wanted_maj = wanted_maj_min.replace(/^(\d+).*$/, '$1')
   if (maj_map[wanted_maj]) return maj_map[wanted_maj]
   // last resort - latest version
   return maj_map[String(Math.max(...Object.keys(maj_map)))]

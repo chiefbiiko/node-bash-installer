@@ -62,9 +62,9 @@ tape('pick_version', function (t) {
     t.equal(pick_version(versions, '9.7'), '9.7.1', 'highest 9.7 patch')
     t.equal(pick_version(versions, 'v11.2'), '11.2.0', 'tolerant')
     var some_versions= [ '10.1.0', '10.2.0', '11.2.0', '9.9.0' ]
-    var bad_version = '10.11.99'
-    t.equal(pick_version(some_versions, bad_version), '11.2.0', 'fallback...')
-    t.equal(pick_version(some_versions, ''), '11.2.0', '...to latest')
+    t.equal(pick_version(some_versions, '10.11.99'), '10.2.0', 'fallback pt1')
+    t.equal(pick_version(some_versions, '9.77.11'), '9.9.0', 'fallback pt2')
+    t.equal(pick_version(some_versions, ''), '11.2.0', 'falsey means latest')
     t.end()
   })
 })
