@@ -1,0 +1,5 @@
+{
+  "builds": [
+    { "src": "./api/installer/index.js", "use": "@now/node" }
+  ]
+}

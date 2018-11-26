@@ -1,6 +1,6 @@
 {
-  "name": "node-bash-installer-service",
-  "version": "0.0.0",
+  "name": "node-bash-installer-api",
+  "version": "0.0.1",
   "description": "ephemeral service that serves node-bash-installers",
   "main": "index.js",
   "scripts": {

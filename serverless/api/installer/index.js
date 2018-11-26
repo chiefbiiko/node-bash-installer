@@ -11,8 +11,6 @@ var {
 } = require('./../../lib.js')
 
 // TODO: use some request identifier for better logs
-// TODO: set some informative respones headers: 
-//       x-installer-node-version, x-installer-os, x-installer-arch
 function serve (req, res) {
   log_info(`incoming request for: ${req.url}`)
   // what u want
@@ -31,7 +29,12 @@ function serve (req, res) {
       var payload = Buffer.concat([ SKELETON, tarball ])
       // serve it with correct content type
       log_info('bouta serve an installer')
-      res.writeHead(200, { 'content-type': 'application/x-sh' })
+      res.writeHead(200, { 
+        'content-type': 'application/x-sh',
+        'node-bash-installer-node-version': version,
+        'node-bash-installer-arch': query.arch,
+        'node-bash-installer-os': query.os
+      })
       res.end(payload)
     })
   })

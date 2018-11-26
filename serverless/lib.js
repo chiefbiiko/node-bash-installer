@@ -24,7 +24,7 @@ function parse_query_params (req) {
   var params = parse(req.url).query.split('&').reduce(function (acc, cur) {
     if (!/[^\s]=[^\s]/.test(cur)) return acc
     var kv = cur.split('=')
-    acc[kv[0]] = kv[1].toLowerCase()
+    acc[kv[0].toLowerCase()] = kv[1]
     return acc
   }, {})
   if (!params.version) {
@@ -87,7 +87,7 @@ function pick_version (versions, wanted) {
   // below *map objects map to the highest version number among (*)
   // fallback to maj min match
   var maj_min_map = versions.reduce(function (acc, cur) {
-    var maj_min = cur.replace(/\.[^\.]*$/, '')
+    var maj_min = cur.replace(/\.\d+$/, '')
     if (!acc[maj_min] || compare_versions(cur, acc[maj_min]) === 1)
       acc[maj_min] = cur
     return acc
@@ -97,7 +97,7 @@ function pick_version (versions, wanted) {
   // fallback to maj match
   var maj_map = Object.keys(maj_min_map)
     .reduce(function (acc, cur) {
-      acc[cur.replace(/\.[^\.]*$/, '')] = maj_min_map[cur]
+      acc[cur.replace(/\.\d+$/, '')] = maj_min_map[cur]
       return acc
     }, {})
   var wanted_maj = wanted_maj_min.replace(/^(\d+).*$/, '$1')
@@ -107,11 +107,15 @@ function pick_version (versions, wanted) {
 }
 
 function is_version (x) {
-  return /^\d{1,2}(?:\.\d\d?){0,2}\.?$/.test(x)
+  return /^\d+(?:\.\d+){0,2}\.?$/.test(x)
 }
 
 function to_tarball_url (os, arch, version) {
   return `https://nodejs.org/dist/v${version}/node-v${version}-${os}-${arch}.tar.gz`
+}
+
+function gen_req_id (req) {
+  
 }
 
 module.exports = {
