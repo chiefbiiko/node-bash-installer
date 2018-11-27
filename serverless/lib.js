@@ -115,7 +115,7 @@ function to_tarball_url (os, arch, version) {
 }
 
 function gen_req_id (req) {
-  
+  return `${Date.now()}_${req.headers['user-agent']}_${req.url}`
 }
 
 module.exports = {
