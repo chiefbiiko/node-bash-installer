@@ -83,7 +83,7 @@ tape('parse_query_params', function (t) {
   var query = parse_query_params(req2)
   t.equal(query.os, 'linux', 'os fallback')
   t.equal(query.arch, 'x64', 'parsed arch pt 2')
-  t.equal(query.version, '', 'empty string internally means provide latest')
+  t.equal(query.version, undefined, 'undefined internally means provide latest')
   t.end()
 })
 

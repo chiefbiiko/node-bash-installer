@@ -1,6 +1,7 @@
 var {
   log_info,
   http_panic,
+  gen_random_id,
   parse_query_params,
   getz,
   list_versions,
@@ -10,25 +11,20 @@ var {
   SKELETON
 } = require('./../../lib.js')
 
-// TODO: use some request identifier for better logs
 function serve (req, res) {
-  log_info(`incoming request for: ${req.url}`)
-  // what u want
+  var lambda_id = gen_random_id()
+  log_info(lambda_id, `incoming request 4 ${req.url}`)
   var query = parse_query_params(req)
-  // fetch node dist list
+  // TODO: if !query.os|arch guess them from the user agent req header
   list_versions(function (err, versions) {
-    if (err) return http_panic(res, err, 424)
-    if (!is_version(query.version)) return http_panic(res, Error('bad version'), 400)
+    if (err) return http_panic(lambda_id, res, err, 424)
     var version = pick_version(versions, query.version)
-    // fetch tarball
     var tarball_url = to_tarball_url(query.os, query.arch, version)
-    log_info(`fetching tarball @ ${tarball_url}`)
+    log_info(lambda_id, `fetching tarball @ ${tarball_url}`)
     getz(tarball_url, function (err, tarball) {
-      if (err) return http_panic(res, err, 424)
-      // concat skeleton.bash with the tarball
+      if (err) return http_panic(lambda_id, res, err, 424)
       var payload = Buffer.concat([ SKELETON, tarball ])
-      // serve it with correct content type
-      log_info('bouta serve an installer')
+      log_info(lambda_id, 'ballin! bouta serve an installer')
       res.writeHead(200, { 
         'content-type': 'application/x-sh',
         'node-bash-installer-node-version': version,
